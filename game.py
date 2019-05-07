@@ -9,12 +9,15 @@ BLUE_COLOR = (0,0,255)
 BLACK__COLOR = (0,0,0)
 # determine how long the loop will run, FPS
 clock = pygame.time.Clock()
+# initiallize font from pygame
+pygame.font.init()
+font = pygame.font.SysFont('microsoftphagspa',50)
 class Game():
     # similar to FPS
     TICK_RATE = 60
 
     # initiallizer for the game class
-    def __init__(self, title,width,height):
+    def __init__(self,imagePath,title,width,height):
         self.title = title
         self.width = width
         self.height = height
@@ -22,14 +25,20 @@ class Game():
         self.game_screen = pygame.display.set_mode((width, height))
         self.game_screen.fill(WHITE_COLOR)
         pygame.display.set_caption(title)
+        # save the image to backgournd image and then transform and save to self.image to use for display later on
+        background_img = pygame.image.load(imagePath)
+        self.image = pygame.transform.scale(background_img,(width,height))
     # function to run the game
     def run_game(self):
          # variable for a loop to determine wether to end the game
         is_game_over = False
         direction = 0
-        # initiallize PlayerChar
+        did_win = False
+        # initiallize PlayerChar npc_char and treasure
         plyrChar = PlayerChar('Images/player.png',375,700,50,50)
         npc_char = NPC('Images/enemy.png',20,400,50,50)
+        npc_char2 = NPC('Images/enemy.png',20,275,50,50)
+        treasure = GameObject('Images/treasure.png', 375,50,50,50)
         # to exit this while not loop we will use event listeners specifically for this it will be w or s for up down
         while not is_game_over:
             for event in pygame.event.get():
@@ -47,15 +56,41 @@ class Game():
                         direction = 0
                 print(event)
             self.game_screen.fill(WHITE_COLOR)
+            self.game_screen.blit(self.image,(0,0))
             # update position of character and then draw
-            plyrChar.move(direction,SCREEN_HEIGHT)
+            treasure.draw(self.game_screen)
+            plyrChar.move(direction,self.height)
             plyrChar.draw(self.game_screen)
             npc_char.move(self.width)
             npc_char.draw(self.game_screen)
+            npc_char2.move(self.width)
+            npc_char2.draw(self.game_screen)
+            # after the movement is done we need to detect if collision has occured
+            if plyrChar.collDetection(npc_char):
+                is_game_over = True
+                did_win = False
+                # create a text box to display
+                text = font.render('Game Over',True, BLACK__COLOR)
+                self.game_screen.blit(text,(300,350))
+                pygame.display.update()
+                clock.tick(2)
+                break
+            elif plyrChar.collDetection(treasure):
+                is_game_over = True
+                did_win = True
+                # display for if the user wins
+                text = font.render('You win',True, BLACK__COLOR)
+                self.game_screen.blit(text,(300,350))
+                pygame.display.update()
+                clock.tick(2)
+                break
             # renders and draws on display
             # game_screen.blit(plyr_img,(375,375))
             pygame.display.update()
             clock.tick(self.TICK_RATE)
+        if did_win:
+            # recursion occurring here, so it will continue running
+            self.run_game()
 class GameObject():
     def __init__(self, image_path,x_pos,y_pos,width,height):
         plyrObjct_img = pygame.image.load(image_path)
@@ -81,6 +116,16 @@ class PlayerChar(GameObject):
         # creates a lower bounds to prevent the player from going out of bounds
         if self.y_pos >= max_height -40:
             self.y_pos = max_height -40
+    def collDetection(self, mNpc_char):
+        if self.y_pos > mNpc_char.y_pos + mNpc_char.height:
+            return False
+        elif self.y_pos + self.height < mNpc_char.y_pos:
+            return False
+        if self.x_pos > mNpc_char.x_pos + mNpc_char.width:
+            return False
+        elif self.x_pos + self.width < mNpc_char.x_pos:
+            return False
+        return True
 class NPC(GameObject):
     # speed used to change direction movement
     SPEED = 5
@@ -96,7 +141,7 @@ class NPC(GameObject):
 # must call and initiallize pygame
 pygame.init()
 # new instance of game
-new_game = Game(SCREEN_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT)
+new_game = Game('Images/background.png',SCREEN_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT)
 new_game.run_game()
 
 pygame.quit()
