@@ -29,15 +29,17 @@ class Game():
         background_img = pygame.image.load(imagePath)
         self.image = pygame.transform.scale(background_img,(width,height))
     # function to run the game
-    def run_game(self):
+    def run_game(self, mlvlSpeed):
          # variable for a loop to determine wether to end the game
         is_game_over = False
         direction = 0
         did_win = False
         # initiallize PlayerChar npc_char and treasure
         plyrChar = PlayerChar('Images/player.png',375,700,50,50)
-        npc_char = NPC('Images/enemy.png',20,400,50,50)
-        npc_char2 = NPC('Images/enemy.png',20,275,50,50)
+        npc_char= NPC('Images/enemy.png',20,400,50,50)
+        npc_char.SPEED *= mlvlSpeed
+        npc_char2 = NPC('Images/enemy.png',20,175,50,50)
+        npc_char2.SPEED *= mlvlSpeed
         treasure = GameObject('Images/treasure.png', 375,50,50,50)
         # to exit this while not loop we will use event listeners specifically for this it will be w or s for up down
         while not is_game_over:
@@ -54,7 +56,6 @@ class Game():
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                         direction = 0
-                print(event)
             self.game_screen.fill(WHITE_COLOR)
             self.game_screen.blit(self.image,(0,0))
             # update position of character and then draw
@@ -63,10 +64,12 @@ class Game():
             plyrChar.draw(self.game_screen)
             npc_char.move(self.width)
             npc_char.draw(self.game_screen)
-            npc_char2.move(self.width)
-            npc_char2.draw(self.game_screen)
+            # spawn new enemy after level xx has been reached
+            if mlvlSpeed > 2:
+                npc_char2.move(self.width)
+                npc_char2.draw(self.game_screen)
             # after the movement is done we need to detect if collision has occured
-            if plyrChar.collDetection(npc_char):
+            if plyrChar.collDetection(npc_char) or plyrChar.collDetection(npc_char2):
                 is_game_over = True
                 did_win = False
                 # create a text box to display
@@ -90,7 +93,9 @@ class Game():
             clock.tick(self.TICK_RATE)
         if did_win:
             # recursion occurring here, so it will continue running
-            self.run_game()
+            self.run_game(mlvlSpeed + 0.35)
+        else:
+            return
 class GameObject():
     def __init__(self, image_path,x_pos,y_pos,width,height):
         plyrObjct_img = pygame.image.load(image_path)
@@ -142,7 +147,7 @@ class NPC(GameObject):
 pygame.init()
 # new instance of game
 new_game = Game('Images/background.png',SCREEN_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT)
-new_game.run_game()
+new_game.run_game(1)
 
 pygame.quit()
 quit()
