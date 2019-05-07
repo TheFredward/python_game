@@ -12,6 +12,7 @@ clock = pygame.time.Clock()
 # initiallize font from pygame
 pygame.font.init()
 font = pygame.font.SysFont('microsoftphagspa',50)
+"""The next edits will be focused on adding various enemies at a time using an array, expect to have about 5 max, after that the next step will be to have them move in all directions."""
 class Game():
     # similar to FPS
     TICK_RATE = 60
