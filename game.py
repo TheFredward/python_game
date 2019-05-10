@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 SCREEN_TITLE = 'Crossroads'
@@ -16,6 +17,7 @@ font = pygame.font.SysFont('microsoftphagspa',50)
 class Game():
     # similar to FPS
     TICK_RATE = 60
+    npc_list = []
 
     # initiallizer for the game class
     def __init__(self,imagePath,title,width,height):
@@ -35,12 +37,13 @@ class Game():
         is_game_over = False
         direction = 0
         did_win = False
+        # create a random postion for the enemies
+        enemy_posX = randint(1,300)
         # initiallize PlayerChar npc_char and treasure
         plyrChar = PlayerChar('Images/player.png',375,700,50,50)
-        npc_char= NPC('Images/enemy.png',20,400,50,50)
+        npc_char= NPC('Images/enemy.png',40,enemy_posX,50,50)
+        self.npc_list.append(npc_char)
         npc_char.SPEED *= mlvlSpeed
-        npc_char2 = NPC('Images/enemy.png',20,175,50,50)
-        npc_char2.SPEED *= mlvlSpeed
         treasure = GameObject('Images/treasure.png', 375,50,50,50)
         # to exit this while not loop we will use event listeners specifically for this it will be w or s for up down
         while not is_game_over:
@@ -63,31 +66,36 @@ class Game():
             treasure.draw(self.game_screen)
             plyrChar.move(direction,self.height)
             plyrChar.draw(self.game_screen)
-            npc_char.move(self.width)
-            npc_char.draw(self.game_screen)
-            # spawn new enemy after level xx has been reached
-            if mlvlSpeed > 2:
-                npc_char2.move(self.width)
-                npc_char2.draw(self.game_screen)
+            if len(self.npc_list) > 0:
+                i = 0
+                while i < len(self.npc_list):
+                    self.npc_list[i].move(self.width)
+                    self.npc_list[i].draw(self.game_screen)
+                    # spawn new enemy after level xx has been reached
+                    if mlvlSpeed > 2:
+                        self.npc_list[i].move(self.width)
+                        self.npc_list[i].draw(self.game_screen)
+                    i += 1
             # after the movement is done we need to detect if collision has occured
-            if plyrChar.collDetection(npc_char) or plyrChar.collDetection(npc_char2):
-                is_game_over = True
-                did_win = False
-                # create a text box to display
-                text = font.render('Game Over',True, BLACK__COLOR)
-                self.game_screen.blit(text,(300,350))
-                pygame.display.update()
-                clock.tick(2)
-                break
-            elif plyrChar.collDetection(treasure):
-                is_game_over = True
-                did_win = True
-                # display for if the user wins
-                text = font.render('You win',True, BLACK__COLOR)
-                self.game_screen.blit(text,(300,350))
-                pygame.display.update()
-                clock.tick(2)
-                break
+            for enemies in self.npc_list:
+                if plyrChar.collDetection(enemies):
+                    is_game_over = True
+                    did_win = False
+                    # create a text box to display
+                    text = font.render('Game Over',True, BLACK__COLOR)
+                    self.game_screen.blit(text,(300,350))
+                    pygame.display.update()
+                    clock.tick(2)
+                    break
+                elif plyrChar.collDetection(treasure):
+                    is_game_over = True
+                    did_win = True
+                    # display for if the user wins
+                    text = font.render('You win',True, BLACK__COLOR)
+                    self.game_screen.blit(text,(300,350))
+                    pygame.display.update()
+                    clock.tick(2)
+                    break
             # renders and draws on display
             # game_screen.blit(plyr_img,(375,375))
             pygame.display.update()
