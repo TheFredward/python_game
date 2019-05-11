@@ -38,7 +38,7 @@ class Game():
         direction = 0
         did_win = False
         # create a random postion for the enemies
-        enemy_posX = randint(1,300)
+        enemy_posX = randint(200,500)
         # initiallize PlayerChar npc_char and treasure
         plyrChar = PlayerChar('Images/player.png',375,700,50,50)
         npc_char= NPC('Images/enemy.png',40,enemy_posX,50,50)
