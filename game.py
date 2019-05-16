@@ -102,7 +102,7 @@ class Game():
             clock.tick(self.TICK_RATE)
         if did_win:
             # recursion occurring here, so it will continue running
-            self.run_game(mlvlSpeed + 0.35)
+            self.run_game(mlvlSpeed + 0.20)
         else:
             return
 class GameObject():
