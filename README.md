@@ -1,3 +1,4 @@
 # python_game
-# Starting to learn pygame 
-# Simple game based on Pygame
+Starting to learn pygame 
+Design a simple game based on Pygame library
+
