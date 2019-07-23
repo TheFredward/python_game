@@ -1,2 +1,3 @@
 # python_game
-Starting to learn pygame 
+# Starting to learn pygame 
+# Simple game based on Pygame
